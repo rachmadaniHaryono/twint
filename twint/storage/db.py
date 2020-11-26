@@ -1,9 +1,13 @@
+import hashlib
+import json
+import logging
 import sqlite3
 import sys
 import time
-import hashlib
-
 from datetime import datetime
+
+LOGGER = logging.getLogger(__name__)
+
 
 def Conn(database):
     if database:
@@ -246,6 +250,7 @@ def tweets(conn, Tweet, config):
         try:
             mentions = ",".join(Tweet.mentions)
         except TypeError as err:
+            LOGGER.exception(err)
             mentions = json.dumps(Tweet.mentions)
         entry = (Tweet.id,
                     Tweet.id_str,
