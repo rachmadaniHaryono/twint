@@ -4,6 +4,7 @@ import logging
 import sqlite3
 import sys
 import time
+import typing
 from datetime import datetime
 
 LOGGER = logging.getLogger(__name__)
@@ -310,15 +311,26 @@ def tweets(conn, Tweet, config):
         if Tweet.reply_to:
             for reply in Tweet.reply_to:
                 query = 'INSERT INTO replies VALUES(?,?,?)'
-                try:
-                    reply_user_id = int(reply['user_id'])
-                except KeyError as err:
-                    LOGGER.exception(err)
-                    if 'user_id' not in reply:
-                        reply_user_id = 0
-                    else:
-                        raise err
-                cursor.execute(query, (Tweet.id, reply_user_id, reply['username']))
+
+                def get_value(dict_inp: typing.Dict[str, typing.Any], key: str, default_value: typing.Any):
+                    """get value from key with default_value.
+
+                    .. note::
+                        
+                        it may be better to replace this with default :py:class:`dict.get`
+                    """
+                    try:
+                        return dict_inp[key]
+                    except KeyError as err:
+                        if key not in dict_inp:
+                            LOGGER.exception(err)
+                            return default_value
+                        else:
+                            raise err
+
+                reply_user_id = int(get_value(reply, 'user_id', 0))
+                reply_username = get_value(reply, 'username', '')
+                cursor.execute(query, (Tweet.id, reply_user_id, reply_username))
 
         conn.commit()
     except sqlite3.IntegrityError:
