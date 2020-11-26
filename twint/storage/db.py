@@ -310,7 +310,15 @@ def tweets(conn, Tweet, config):
         if Tweet.reply_to:
             for reply in Tweet.reply_to:
                 query = 'INSERT INTO replies VALUES(?,?,?)'
-                cursor.execute(query, (Tweet.id, int(reply['user_id']), reply['username']))
+                try:
+                    reply_user_id = int(reply['user_id'])
+                except KeyError as err:
+                    LOGGER.exception(err)
+                    if 'user_id' not in reply:
+                        reply_user_id = 0
+                    else:
+                        raise err
+                cursor.execute(query, (Tweet.id, reply_user_id, reply['username']))
 
         conn.commit()
     except sqlite3.IntegrityError:
