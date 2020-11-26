@@ -243,6 +243,10 @@ def tweets(conn, Tweet, config):
     try:
         time_ms = round(time.time()*1000)
         cursor = conn.cursor()
+        try:
+            mentions = ",".join(Tweet.mentions)
+        except TypeError as err:
+            mentions = json.dumps(Tweet.mentions)
         entry = (Tweet.id,
                     Tweet.id_str,
                     Tweet.tweet,
@@ -261,7 +265,7 @@ def tweets(conn, Tweet, config):
                     Tweet.username,
                     Tweet.name,
                     Tweet.link,
-                    ",".join(Tweet.mentions),
+                    mentions,
                     ",".join(Tweet.hashtags),
                     ",".join(Tweet.cashtags),
                     ",".join(Tweet.urls),
