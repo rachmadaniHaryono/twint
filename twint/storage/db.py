@@ -1,9 +1,13 @@
 import hashlib
 import json
+import logging
 import sqlite3
 import sys
 import time
 from datetime import datetime
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def Conn(database):
