@@ -1,6 +1,7 @@
 import itertools
 import logging
 import os
+import sqlite3
 
 import pytest
 import vcr
@@ -166,8 +167,7 @@ def test_db_retweet(tmp_path):
     co.Since = "2020-11-22"
     co.Until = "2020-11-24"
     db_path = str(tmp_path / "test.db")
-    test_db(c, twint.run.Profile, db_path)
-    import sqlite3
+    test_db(co, twint.run.Profile, db_path)
     conn = sqlite3.connect(db_path)
     cu = conn.cursor()
     cu.execute('select * from retweets')
